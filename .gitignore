@@ -1,0 +1,13 @@
+# Ignore Node packages (frontend and any subproject)
+**/node_modules/
+**/dist/
+**/.eslintcache
+
+# Ignore Java build output
+/backend/target/
+
+# Common noise
+.env
+.env.*
+*.log
+Thumbs.db

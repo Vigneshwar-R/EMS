@@ -64,7 +64,7 @@ const ListEmployeeComponent = () => {
   return (
     <div className="page-container">
       <div className="content-wrapper">
-        {/* THIS IS THE MISSING SECTION - Employee Directory Header */}
+        
         <div className="page-header">
           <div className="header-left">
             <h2 className="page-title">Employee Directory</h2>

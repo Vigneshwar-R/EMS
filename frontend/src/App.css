@@ -24,6 +24,10 @@
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
 }
 
+html {
+  height: 100%;
+}
+
 body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
     'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
@@ -34,13 +38,23 @@ body {
   line-height: 1.6;
   margin: 0;
   padding: 0;
-  min-height: 100vh;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
 }
 
 .app {
-  min-height: 100vh;
+  min-height: 100%;
   display: flex;
   flex-direction: column;
+  flex: 1;
 }
 
 /* Header Styles */
@@ -104,8 +118,10 @@ body {
 
 /* Main Content */
 .main-content {
-  flex: 1;
+  flex: 1 0 auto;
   padding: 3rem 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .page-container {
@@ -134,9 +150,10 @@ body {
   display: flex;
   justify-content: space-between;
   align-items: flex-start;
-  margin-bottom: 2rem;
+  margin-bottom: 2.5rem;
   flex-wrap: wrap;
-  gap: 1rem;
+  gap: 2rem;
+  padding-top: 1rem;
 }
 
 .header-left {
@@ -144,7 +161,7 @@ body {
 }
 
 .page-title {
-  font-size: 2rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: var(--text-primary);
   margin-bottom: 0.5rem;
@@ -153,7 +170,7 @@ body {
 
 .page-subtitle {
   color: var(--text-secondary);
-  font-size: 1rem;
+  font-size: 1.125rem;
 }
 
 /* Buttons */
@@ -265,7 +282,7 @@ body {
   transform: translateY(-50%);
   width: 20px;
   height: 20px;
-  color: var(--text-secondary);
+  color: #94a3b8;
 }
 
 .search-bar input {
@@ -275,7 +292,7 @@ body {
   border-radius: 12px;
   font-size: 1rem;
   transition: all 0.2s;
-  background: var(--surface);
+  background: #2d3748;
   font-family: inherit;
   color: #ffffff !important;
 }
@@ -601,11 +618,12 @@ body {
 
 /* Footer */
 .app-footer {
-  background: var(--surface);
-  border-top: 1px solid var(--border);
+  background: #2d3748;
+  border-top: 1px solid #4a5568;
   padding: 2rem 0;
   margin-top: auto;
-  width: 100%;
+  flex-shrink: 0;
+  color: #e2e8f0;
 }
 
 .footer-content {
@@ -620,7 +638,7 @@ body {
 }
 
 .footer-content p {
-  color: var(--text-secondary);
+  color: #cbd5e0;
   font-size: 0.875rem;
 }
 
@@ -630,14 +648,14 @@ body {
 }
 
 .footer-links a {
-  color: var(--text-secondary);
+  color: #cbd5e0;
   text-decoration: none;
   font-size: 0.875rem;
   transition: color 0.2s;
 }
 
 .footer-links a:hover {
-  color: var(--primary);
+  color: var(--primary-light);
 }
 
 /* Responsive Design */
@@ -670,25 +688,6 @@ body {
   }
 
   .page-title {
-    font-size: 1.5rem;
-  }
-}
-
-/* Dark mode support (optional) */
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0f172a;
-    --surface: #1e293b;
-    --text-primary: #f1f5f9;
-    --text-secondary: #94a3b8;
-    --border: #334155;
-  }
-
-  .logo-icon {
-    background: rgba(255, 255, 255, 0.1);
-  }
-
-  .employee-card:hover {
-    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+    font-size: 1.75rem;
   }
 }
