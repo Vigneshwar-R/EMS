@@ -1,178 +1,249 @@
-import React, { useEffect, useState } from 'react'
-import { ListEmployees , CreateEmployees, getEmployee, UpdateEmployee } from '../services/EmployeeService'
-import { useNavigate , useParams } from "react-router-dom";
-
+import React, { useEffect, useState } from "react";
+import {
+  CreateEmployees,
+  getEmployee,
+  UpdateEmployee,
+} from "../services/EmployeeService";
+import { useNavigate, useParams } from "react-router-dom";
 
 const EmployeeComponent = () => {
+  const navigator = useNavigate();
+  const { id } = useParams();
 
-  const navigator = useNavigate()
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const [firstName , setfirstName] = useState('')
-  const [lastName , setlastName] = useState('')
-  const [email , setemail] = useState('')
+  const [errors, setErrors] = useState({
+    firstName: "",
+    lastName: "",
+    email: "",
+  });
 
-  const {id} = useParams();
+  useEffect(() => {
+    if (id) {
+      getEmployee(id)
+        .then((response) => {
+          setFirstName(response.data.firstName);
+          setLastName(response.data.lastName);
+          setEmail(response.data.email);
+        })
+        .catch((error) => console.error(error));
+    }
+  }, [id]);
 
-  const [errors , setErrors] = useState({
-    firstName : '',
-    lastName:'',
-    email: ''
-  })
-
-
-  useEffect(() => 
-    {
-      if(id)
-        {
-         getEmployee(id).then((response) => 
-          {
-            setfirstName(response.data.firstName);
-            setlastName(response.data.lastName);
-            setemail(response.data.email);
-          }).catch(error => console.error(error)) 
-        }
-    } , [id])
-
-
-  const handleFirstName = e => setfirstName(e.target.value)
-  const handleLastName = e => setlastName(e.target.value)
-  const handleEmail = e => setemail(e.target.value)
-
- 
-  const SaveOrUpdateEmployee = (e) => 
-    
-  {
-    const employee = { firstName, lastName, email }; 
-    console.log(employee); 
-
-    if(validateForm())
-      {
-        {
-          if(id)
-            {
-              UpdateEmployee(id,employee).then((response) => console.log(response.data)).catch((error) => console.error('Error updating employee'))
-              navigator('/employees')
-
-            } else 
-            {
-              CreateEmployees(employee).then((response) => console.log(response.data)).catch((error) => console.error('Error adding employee'))
-              navigator('/employees')
-            }
-
-        }
-
-        
-  
-      }
-
+  const handleFirstName = (e) => {
+    setFirstName(e.target.value);
+    if (errors.firstName) {
+      setErrors((prev) => ({ ...prev, firstName: "" }));
+    }
   };
 
-  function validateForm()
-  {
+  const handleLastName = (e) => {
+    setLastName(e.target.value);
+    if (errors.lastName) {
+      setErrors((prev) => ({ ...prev, lastName: "" }));
+    }
+  };
+
+  const handleEmail = (e) => {
+    setEmail(e.target.value);
+    if (errors.email) {
+      setErrors((prev) => ({ ...prev, email: "" }));
+    }
+  };
+
+  const validateForm = () => {
     let valid = true;
+    const errorsCopy = { ...errors };
 
-    errorsCopy = {...errors}
-
-    if(firstName.trim()){
-      errorsCopy.firstName = '';
+    if (firstName.trim()) {
+      errorsCopy.firstName = "";
     } else {
-      errorsCopy.firstName = 'First name is required.'
-      valid = false
+      errorsCopy.firstName = "First name is required";
+      valid = false;
     }
 
-    if(lastName.trim())
-      {
-        errorsCopy.lastName = '';
+    if (lastName.trim()) {
+      errorsCopy.lastName = "";
+    } else {
+      errorsCopy.lastName = "Last name is required";
+      valid = false;
+    }
+
+    if (email.trim()) {
+      // Basic email validation
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (emailRegex.test(email)) {
+        errorsCopy.email = "";
       } else {
-        errorsCopy.lastName = 'Last name is required.'
-        valid = false
+        errorsCopy.email = "Please enter a valid email address";
+        valid = false;
       }
+    } else {
+      errorsCopy.email = "Email is required";
+      valid = false;
+    }
 
-    if(email.trim())
-      {
-        errorsCopy.email = '';
+    setErrors(errorsCopy);
+    return valid;
+  };
+
+  const SaveOrUpdateEmployee = (e) => {
+    e.preventDefault();
+
+    if (validateForm()) {
+      const employee = { firstName, lastName, email };
+      setIsSubmitting(true);
+
+      if (id) {
+        UpdateEmployee(id, employee)
+          .then((response) => {
+            console.log(response.data);
+            setIsSubmitting(false);
+            navigator("/employees");
+          })
+          .catch((error) => {
+            console.error("Error updating employee:", error);
+            setIsSubmitting(false);
+          });
       } else {
-        errorsCopy.email = 'email is required.'
-        valid = false
+        CreateEmployees(employee)
+          .then((response) => {
+            console.log(response.data);
+            setIsSubmitting(false);
+            navigator("/employees");
+          })
+          .catch((error) => {
+            console.error("Error adding employee:", error);
+            setIsSubmitting(false);
+          });
       }
+    }
+  };
 
+  const pageTitle = () => {
+    if (id) {
+      return "Update Employee";
+    } else {
+      return "Add New Employee";
+    }
+  };
 
-    setErrors(errorsCopy)
-
-    return valid
-
-  }
-
-  function pageTitle()
-  {
-    if(id)
-      {
-        return <h2 className='card-header text-center'> Update Employee </h2>
-      }
-      else 
-      {
-       return <h2 className='card-header text-center'> Add Employee </h2>
-      }
-  }
-
-
+  const pageSubtitle = () => {
+    if (id) {
+      return "Update the employee information below";
+    } else {
+      return "Fill in the details below to add a new team member";
+    }
+  };
 
   return (
-    <div className='container'>
-      <br></br>
-      <br></br>
-      <div className='row'>
-        <div className='card col-md-6 offset-md-3 offset-md-3'>
-          {
-          pageTitle()
-          }
-        <div className = 'card-body'>
+    <div className="page-container">
+      <div className="form-wrapper">
+        <div className="form-container">
+          <div className="form-header">
+            <h2>{pageTitle()}</h2>
+            <p>{pageSubtitle()}</p>
+          </div>
 
-          <form>
-            <div className='form-group mb-2'>
+          <form className="employee-form" onSubmit={SaveOrUpdateEmployee}>
+            <div className="form-group">
+              <label htmlFor="firstName">
+                First Name <span className="required">*</span>
+              </label>
+              <input
+                type="text"
+                id="firstName"
+                name="firstName"
+                value={firstName}
+                onChange={handleFirstName}
+                className={errors.firstName ? "error" : ""}
+                placeholder="Enter first name"
+              />
+              {errors.firstName && (
+                <span className="error-message">{errors.firstName}</span>
+              )}
+            </div>
 
-              <label className='form-label'>First Name:</label>
-              <input type='text' 
-              placeholder='Enter first name' 
-              name='firstName' 
-              value={firstName} 
-              className={`form-control ${errors.firstName ? 'is-invalid' : ''}`}
-              onChange={handleFirstName}>
-              </input>
-              { errors.firstName && <div className='invalid-feedback'> {errors.firstName}</div> }
-              </div>
+            <div className="form-group">
+              <label htmlFor="lastName">
+                Last Name <span className="required">*</span>
+              </label>
+              <input
+                type="text"
+                id="lastName"
+                name="lastName"
+                value={lastName}
+                onChange={handleLastName}
+                className={errors.lastName ? "error" : ""}
+                placeholder="Enter last name"
+              />
+              {errors.lastName && (
+                <span className="error-message">{errors.lastName}</span>
+              )}
+            </div>
 
+            <div className="form-group">
+              <label htmlFor="email">
+                Email Address <span className="required">*</span>
+              </label>
+              <input
+                type="email"
+                id="email"
+                name="email"
+                value={email}
+                onChange={handleEmail}
+                className={errors.email ? "error" : ""}
+                placeholder="Enter email address"
+              />
+              {errors.email && (
+                <span className="error-message">{errors.email}</span>
+              )}
+            </div>
 
-              <div className='form-group mb-2'>
-              <label className='form-label'>Last Name:</label>
-              <input type='text' placeholder='Enter last name' name='lastName' value={lastName}            
-              className={`form-control ${errors.lastName ? 'is-invalid' : ''}` }
-              onChange={handleLastName}>
-              </input>
-              {errors.lastName && <div className='invalid-feedback'> {errors.lastName} </div>}
-              </div>
-
-              <div className='form-group mb-2'>
-              <label className='form-label'>E-mail:</label>
-              <input type='text' placeholder='Enter email' name='email' value={email} 
-              className={`form-control ${errors.email ? 'is-invalid' : ''}`}              
-               onChange={handleEmail}>
-               </input>
-               {errors.email && <div className='invalid-feedback'> {errors.email} </div>}
-              </div>
-
+            <div className="form-actions">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => navigator("/employees")}
+                disabled={isSubmitting}
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                className="btn btn-primary"
+                disabled={isSubmitting}
+              >
+                {isSubmitting ? (
+                  <>
+                    <span className="spinner"></span>
+                    Saving...
+                  </>
+                ) : (
+                  <>
+                    <svg
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                    >
+                      <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z" />
+                      <polyline points="17 21 17 13 7 13 7 21" />
+                      <polyline points="7 3 7 8 15 8" />
+                    </svg>
+                    {id ? "Update Employee" : "Save Employee"}
+                  </>
+                )}
+              </button>
+            </div>
           </form>
-
-          <button className='btn btn-success' onClick={SaveOrUpdateEmployee}>Submit</button>
-
         </div>
-        
-        </div>
-
       </div>
-      
     </div>
-  )
-}
+  );
+};
 
-export default EmployeeComponent
+export default EmployeeComponent;
